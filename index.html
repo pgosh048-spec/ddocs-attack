@@ -1,0 +1,358 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>SecureWave — Cyber Command Center</title>
+  <meta name="description" content="SecureWave real-time DDoS protection and threat intelligence dashboard." />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/echarts@5.4.3/dist/echarts.min.js"></script>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+  <!-- ── BOOT SCREEN ── -->
+  <div id="boot-screen">
+    <div class="boot-inner">
+      <div class="boot-logo">
+        <svg width="48" height="48" viewBox="0 0 48 48" fill="none">
+          <polygon points="24,4 44,36 4,36" stroke="#06b6d4" stroke-width="2" fill="none" opacity="0.3"/>
+          <polygon points="24,10 38,34 10,34" stroke="#06b6d4" stroke-width="1.5" fill="none" opacity="0.6"/>
+          <circle cx="24" cy="26" r="5" fill="#06b6d4"/>
+          <line x1="24" y1="4" x2="24" y2="16" stroke="#06b6d4" stroke-width="2"/>
+        </svg>
+      </div>
+      <div class="boot-title">SECUREWAVE</div>
+      <div class="boot-sub">CYBER COMMAND CENTER v2.4.1</div>
+      <div class="boot-bar-track"><div class="boot-bar-fill" id="boot-bar"></div></div>
+      <div class="boot-status" id="boot-status">Initializing kernel modules…</div>
+    </div>
+  </div>
+
+  <!-- ── MAIN APP ── -->
+  <div id="app" class="hidden">
+
+    <!-- TOPBAR -->
+    <header class="topbar">
+      <div class="topbar-left">
+        <svg class="logo-icon" width="28" height="28" viewBox="0 0 48 48" fill="none">
+          <polygon points="24,4 44,36 4,36" stroke="#06b6d4" stroke-width="2" fill="none" opacity="0.4"/>
+          <circle cx="24" cy="26" r="5" fill="#06b6d4"/>
+          <line x1="24" y1="4" x2="24" y2="16" stroke="#06b6d4" stroke-width="2"/>
+        </svg>
+        <span class="logo-text">SECURE<strong>WAVE</strong></span>
+        <div class="status-badges">
+          <span class="badge badge-active" id="global-status-badge">● ACTIVE</span>
+          <span class="badge badge-info" id="mode-badge">SHIELD MODE</span>
+        </div>
+      </div>
+      <div class="topbar-center">
+        <span class="clock" id="top-clock">--:--:--</span>
+        <span class="clock-sep">UTC</span>
+      </div>
+      <div class="topbar-right">
+        <div class="notif-btn" id="notif-btn" title="Notifications">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
+          <span class="notif-count" id="notif-count">3</span>
+        </div>
+        <div class="user-chip">
+          <div class="user-avatar">OPS</div>
+          <span>Admin</span>
+        </div>
+      </div>
+    </header>
+
+    <div class="layout">
+
+      <!-- SIDEBAR -->
+      <nav class="sidebar" id="sidebar">
+        <button class="nav-item active" data-view="dashboard" title="Dashboard">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+          <span>Dashboard</span>
+        </button>
+        <button class="nav-item" data-view="threatmap" title="Threat Map">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"/></svg>
+          <span>Threat Map</span>
+        </button>
+        <button class="nav-item" data-view="incidents" title="Incidents">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <span>Incidents</span>
+        </button>
+        <button class="nav-item" data-view="rules" title="Rules">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span>Rules</span>
+        </button>
+        <div class="nav-spacer"></div>
+        <button class="nav-item" data-view="settings" title="Settings">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+          <span>Settings</span>
+        </button>
+      </nav>
+
+      <!-- CONTENT AREA -->
+      <main class="content">
+
+        <!-- ── VIEW: DASHBOARD ── -->
+        <section class="view active" id="view-dashboard">
+          <!-- Stat Cards -->
+          <div class="stat-grid">
+            <div class="stat-card" id="card-rps">
+              <div class="stat-label">REQUESTS / SEC</div>
+              <div class="stat-value" id="val-rps">2,418,302</div>
+              <div class="stat-delta positive" id="delta-rps">↑ 4.2%</div>
+              <div id="chart-rps" class="spark-chart"></div>
+            </div>
+            <div class="stat-card" id="card-blocked">
+              <div class="stat-label">BLOCKED TRAFFIC</div>
+              <div class="stat-value accent-red" id="val-blocked">98.3%</div>
+              <div class="stat-delta" id="delta-blocked">12,847 threats</div>
+              <div id="chart-donut" class="spark-chart"></div>
+            </div>
+            <div class="stat-card" id="card-cpu">
+              <div class="stat-label">CPU / MEMORY</div>
+              <div class="stat-value" id="val-cpu">34% <span class="stat-sep">/</span> 61%</div>
+              <div class="stat-delta positive">System nominal</div>
+              <div id="chart-gauge" class="spark-chart"></div>
+            </div>
+            <div class="stat-card" id="card-rules">
+              <div class="stat-label">ACTIVE RULES</div>
+              <div class="stat-value accent-cyan" id="val-rules">1,247</div>
+              <div class="stat-delta">eBPF + policy rules</div>
+              <div class="rules-mini" id="rules-mini"></div>
+            </div>
+          </div>
+
+          <!-- Middle Row -->
+          <div class="mid-grid">
+            <!-- Traffic Chart -->
+            <div class="glass-card traffic-card">
+              <div class="card-header">
+                <span class="card-title">TRAFFIC ANALYSIS <span class="card-sub">— 24h rolling</span></span>
+                <div class="chart-legend">
+                  <span class="legend-dot" style="background:#06b6d4"></span><span>Allowed</span>
+                  <span class="legend-dot" style="background:#ef4444"></span><span>Blocked</span>
+                </div>
+              </div>
+              <div id="chart-traffic" style="height:200px;"></div>
+            </div>
+
+            <!-- Incident Feed -->
+            <div class="glass-card incident-card">
+              <div class="card-header">
+                <span class="card-title">INCIDENT FEED</span>
+                <span class="live-dot">● LIVE</span>
+              </div>
+              <div class="incident-list" id="incident-list"></div>
+            </div>
+          </div>
+
+          <!-- Protection Toggles -->
+          <div class="glass-card toggles-card">
+            <div class="card-header">
+              <span class="card-title">PROTECTION MODULES</span>
+              <button class="btn-ghost" id="global-toggle-btn">GLOBAL OFF</button>
+            </div>
+            <div class="toggle-grid" id="toggle-grid"></div>
+          </div>
+        </section>
+
+        <!-- ── VIEW: THREAT MAP ── -->
+        <section class="view" id="view-threatmap">
+          <div class="glass-card" style="height:calc(100vh - 100px); position:relative;">
+            <div class="card-header">
+              <span class="card-title">🌐 LIVE THREAT MAP</span>
+              <span class="live-dot">● LIVE</span>
+            </div>
+            <canvas id="threat-canvas"></canvas>
+            <div class="map-legend">
+              <div><span class="legend-dot" style="background:#ef4444"></span> Volumetric</div>
+              <div><span class="legend-dot" style="background:#f59e0b"></span> Protocol</div>
+              <div><span class="legend-dot" style="background:#8b5cf6"></span> Application</div>
+              <div><span class="legend-dot" style="background:#06b6d4"></span> Scrubbed</div>
+            </div>
+            <div class="map-stats" id="map-stats"></div>
+          </div>
+        </section>
+
+        <!-- ── VIEW: INCIDENTS ── -->
+        <section class="view" id="view-incidents">
+          <div class="glass-card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">INCIDENT LOG</span>
+              <div class="filter-row">
+                <select class="select-sm" id="incident-filter">
+                  <option value="all">All Severity</option>
+                  <option value="critical">Critical</option>
+                  <option value="warning">Warning</option>
+                  <option value="resolved">Resolved</option>
+                </select>
+                <button class="btn-primary btn-sm" id="export-btn">Export PDF</button>
+              </div>
+            </div>
+            <table class="incident-table">
+              <thead>
+                <tr><th>TIME</th><th>TYPE</th><th>SOURCE</th><th>COUNTRY</th><th>PPS</th><th>STATUS</th><th>ACTION</th></tr>
+              </thead>
+              <tbody id="incident-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── VIEW: RULES ── -->
+        <section class="view" id="view-rules">
+          <div class="glass-card" style="flex:1;">
+            <div class="card-header">
+              <span class="card-title">ACTIVE RULES</span>
+              <button class="btn-primary btn-sm" id="add-rule-btn">+ Add Rule</button>
+            </div>
+            <table class="incident-table">
+              <thead>
+                <tr><th>ID</th><th>TYPE</th><th>TARGET</th><th>LIMIT</th><th>ACTION</th><th>HITS</th><th>CONTROL</th></tr>
+              </thead>
+              <tbody id="rules-table-body"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ── VIEW: SETTINGS ── -->
+        <section class="view" id="view-settings">
+          <div class="settings-grid">
+
+            <div class="glass-card settings-card">
+              <div class="card-title">DETECTION SENSITIVITY</div>
+              <div class="setting-row">
+                <label>Global Sensitivity</label>
+                <div class="slider-group">
+                  <input type="range" id="s-sensitivity" min="1" max="10" value="7" class="sw-slider" />
+                  <span class="slider-val" id="sv-sensitivity">7</span>
+                </div>
+              </div>
+              <div class="setting-row">
+                <label>Anomaly Threshold (θ)</label>
+                <div class="slider-group">
+                  <input type="range" id="s-theta" min="0" max="100" value="65" class="sw-slider" />
+                  <span class="slider-val" id="sv-theta">0.65</span>
+                </div>
+              </div>
+              <div class="setting-row">
+                <label>Window Size</label>
+                <select class="select-sm" id="s-window">
+                  <option>1s</option><option selected>5s</option><option>10s</option><option>30s</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="glass-card settings-card">
+              <div class="card-title">PER-PROTOCOL RATE LIMITS</div>
+              <div class="setting-row">
+                <label>TCP SYN (pps/src)</label>
+                <input type="number" class="input-sm" id="r-syn" value="10000" />
+              </div>
+              <div class="setting-row">
+                <label>UDP (Mbps/src)</label>
+                <input type="number" class="input-sm" id="r-udp" value="100" />
+              </div>
+              <div class="setting-row">
+                <label>ICMP (pps/src)</label>
+                <input type="number" class="input-sm" id="r-icmp" value="500" />
+              </div>
+              <div class="setting-row">
+                <label>HTTP (req/s/src)</label>
+                <input type="number" class="input-sm" id="r-http" value="1000" />
+              </div>
+            </div>
+
+            <div class="glass-card settings-card">
+              <div class="card-title">GeoIP BLOCK POLICY</div>
+              <div class="setting-row">
+                <label>Mode</label>
+                <select class="select-sm" id="geo-mode"><option>Block</option><option>Monitor</option></select>
+              </div>
+              <div class="setting-row">
+                <label>Blocked Countries</label>
+                <div class="tag-row" id="geo-tags">
+                  <span class="geo-tag">CN <button onclick="removeTag(this)">×</button></span>
+                  <span class="geo-tag">RU <button onclick="removeTag(this)">×</button></span>
+                  <span class="geo-tag">KP <button onclick="removeTag(this)">×</button></span>
+                </div>
+              </div>
+              <div class="setting-row">
+                <input type="text" class="input-sm" id="geo-input" placeholder="Add country code…" />
+                <button class="btn-primary btn-sm" onclick="addGeoTag()">Add</button>
+              </div>
+            </div>
+
+            <div class="glass-card settings-card">
+              <div class="card-title">ALERT NOTIFICATIONS</div>
+              <div class="setting-row">
+                <label>Email</label>
+                <input type="email" class="input-sm" id="n-email" value="ops@securewave.io" />
+              </div>
+              <div class="setting-row">
+                <label>Slack Webhook</label>
+                <input type="text" class="input-sm" id="n-slack" placeholder="https://hooks.slack.com/…" />
+              </div>
+              <div class="setting-row">
+                <label>PagerDuty Key</label>
+                <input type="text" class="input-sm" id="n-pager" placeholder="Integration key…" />
+              </div>
+              <div class="setting-row">
+                <label>Min Severity</label>
+                <select class="select-sm" id="n-severity">
+                  <option>INFO</option><option>WARNING</option><option selected>CRITICAL</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="glass-card settings-card">
+              <div class="card-title">AUTOMATED RESPONSE</div>
+              <div class="setting-row">
+                <label>Auto-block Duration</label>
+                <select class="select-sm" id="a-block">
+                  <option>5 min</option><option selected>15 min</option><option>1 hour</option><option>Permanent</option>
+                </select>
+              </div>
+              <div class="setting-row">
+                <label>Auto-report</label>
+                <div class="toggle-mini" id="a-report-toggle" onclick="miniToggle(this)">
+                  <div class="toggle-mini-knob active"></div>
+                </div>
+                <select class="select-sm" style="margin-left:8px" id="a-format"><option>PDF</option><option>JSON</option></select>
+              </div>
+              <div class="setting-row">
+                <label>Challenge Mode</label>
+                <select class="select-sm" id="a-challenge"><option>CAPTCHA</option><option>JS Proof</option><option>Off</option></select>
+              </div>
+              <div class="setting-row">
+                <label>Trigger After (fails)</label>
+                <input type="number" class="input-sm" id="a-fails" value="3" style="width:60px" />
+              </div>
+            </div>
+
+          </div>
+          <div class="settings-footer">
+            <button class="btn-ghost" id="reset-btn">Reset Defaults</button>
+            <button class="btn-primary" id="save-btn">💾 Save All Changes</button>
+          </div>
+        </section>
+
+      </main>
+    </div>
+
+    <!-- Notification Drawer -->
+    <div class="notif-drawer" id="notif-drawer">
+      <div class="notif-header">
+        <span>ALERTS</span>
+        <button onclick="document.getElementById('notif-drawer').classList.remove('open')">×</button>
+      </div>
+      <div id="notif-items"></div>
+    </div>
+
+    <!-- Toast container -->
+    <div id="toast-container"></div>
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
